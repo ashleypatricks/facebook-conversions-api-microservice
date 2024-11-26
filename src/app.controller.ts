@@ -59,6 +59,6 @@ export class AppController {
       return {
         data: `Something went wrong. User:${id} unsuccessfully tracked.`,
       };
-    return { data: `User:${id} unsuccessfully tracked` };
+    return { data: `User:${id} successfully tracked` };
   }
 }
