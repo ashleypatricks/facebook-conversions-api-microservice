@@ -11,7 +11,7 @@ The app has the following features:
 
 ## Use Case
 
-This project is typically best suited as a 3rd-party API tool / microservice which will receive data about an already logged-in user to your website, andsend that information to Facebook as a result of visiting a targeted page on your website.
+This project is typically best suited as a 3rd-party API tool / microservice which will receive data about an already logged-in user to your website, and send that information to Facebook as a result of visiting a targeted page on your website.
 
 ## Future Improvements
 
