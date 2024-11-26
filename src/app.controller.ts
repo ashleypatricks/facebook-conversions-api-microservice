@@ -9,7 +9,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-import { CreateUserDto } from './users/dto/create.user.dto';
+import { CreateUserDto, TrackUserDto } from './users/dto';
 
 import { UserService } from './users/user.service';
 import { ConversionApiService } from './facebook/conversion.api.service';
@@ -32,33 +32,67 @@ export class AppController {
     return await this.userService.getUser({ id });
   }
 
-  @Post('user')
-  async createUser(@Body(new ValidationPipe()) userData: CreateUserDto) {
-    const {
-      data: { email, fbLoginId, firstName, dob, gender, lastName, id },
-    } = await this.userService.createUser(userData);
+  @Post('track')
+  async trackUser(@Body(new ValidationPipe()) userTrackingData: TrackUserDto) {
+    try {
+      const {
+        actionSource,
+        clientIpAddress,
+        clientUserAgent,
+        eventName,
+        eventSourceUrl,
+        userId,
+      } = userTrackingData;
 
-    const trackingResponse =
-      await this.conversionApiService.sendTrackingInformation({
-        eventName: 'PageView',
-        eventTime: Math.floor(Date.now() / 1000),
-        actionSource: 'website',
-        eventSourceUrl: 'www.test-url.com',
-        email,
-        clientIpAddress: null,
-        clientUserAgent:
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0',
-        facebookLoginId: fbLoginId,
-        firstName,
-        dateOfBirth: dob,
-        gender,
-        lastName,
+      const user = await this.userService.getUser({
+        id: userId,
       });
 
-    if (!trackingResponse)
-      return {
-        data: `Something went wrong. User:${id} unsuccessfully tracked.`,
-      };
-    return { data: `User:${id} successfully tracked` };
+      if (!user.data)
+        return {
+          data: `Something went wrong. User:${userId} not found.`,
+        };
+
+      const {
+        data: { email, fbLoginId, firstName, dob, gender, lastName },
+      } = user;
+
+      const trackingResponse =
+        await this.conversionApiService.sendTrackingInformation({
+          eventName,
+          eventTime: Math.floor(Date.now() / 1000),
+          actionSource,
+          eventSourceUrl,
+          email,
+          clientIpAddress,
+          clientUserAgent,
+          facebookLoginId: fbLoginId,
+          firstName,
+          dateOfBirth: dob,
+          gender,
+          lastName,
+        });
+
+      if (!trackingResponse)
+        return {
+          data: `Something went wrong. User:${userId} unsuccessfully tracked.`,
+        };
+      return { data: `User:${userId} successfully tracked` };
+    } catch (e) {
+      return { data: `Something went wrong. ${e.message}` };
+    }
+  }
+
+  @Post('user')
+  async createUser(@Body(new ValidationPipe()) userData: CreateUserDto) {
+    const { data: currentUser } = await this.userService.getUser({
+      email: userData.email,
+    });
+
+    if (currentUser) return { data: `User:${currentUser.id} already exists` };
+
+    const { data: user } = await this.userService.createUser(userData);
+
+    return { data: `User:${user} successfully created` };
   }
 }

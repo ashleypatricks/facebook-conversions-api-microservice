@@ -74,7 +74,7 @@ The `id` is an auto incremented number e.g. `5`:
 
 - `GET: localhost:3000/user/:{id}`
 
-#### Create a User and send page tracking information to Facebook
+#### Create a User
 
 - `POST: localhost:3000/user`
 
@@ -88,5 +88,22 @@ body:
     "lastName": "some last name",
     "gender": "Male",
     "dob": "10-04-1982"
+}
+```
+
+#### Send send page tracking information to Facebook
+
+- `POST: localhost:3000/track`
+
+body:
+
+```
+{
+    "userId": 1,
+    "eventName": "PageView",
+    "actionSource": "website",
+    "eventSourceUrl": "www.test-url.com",
+    "clientIpAddress": "232.166.220.150",
+    "clientUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:63.0) Gecko/20100101 Firefox/63.0"
 }
 ```
