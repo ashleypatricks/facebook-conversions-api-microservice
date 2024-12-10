@@ -50,7 +50,7 @@ The app requires a `.env` file placed in the root with the following information
 
 The initial database migrations are already run for Prisma, and the the Prisma client is already synchronised to this migration in this repo. If you make changes to the schema, or face any errors upon start up, then you can run the following to update the schema and client:
 
-`npx prisma migrate dev --name init`
+`npx prisma migrate dev`
 
 ## Compile and run the project
 
